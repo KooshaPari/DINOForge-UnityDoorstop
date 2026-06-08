@@ -3,13 +3,13 @@ permissions:
   contents: read
 
 on:
+  push:
+  pull_request:
   workflow_dispatch:
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-
-on: [push, pull_request]
 
 jobs:
   build-windows:
@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Configure paths
         run: |
           New-Item -ItemType Directory -Force -Path ./artifacts/release/x64
@@ -66,7 +66,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Configure paths
         run: |
           bash -c "mkdir -p artifacts/{verbose,release,debug}/{x86,x64}"
@@ -126,7 +126,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v4@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
       - name: Configure paths
         run: |
           mkdir -p artifacts/{verbose,release,debug}/universal
@@ -180,7 +180,7 @@ jobs:
 
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/download-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           path: artifacts
       - name: Grab version
@@ -197,10 +197,9 @@ jobs:
             (cd ${dir}; zip -r ../../dist/${dir}_${{ env.doorstop_version }}.zip *)
           done
       - name: Create release
-        uses: marvinpinto/action-automatic-releases@latest
+        uses: softprops/action-gh-release@c95fe14e4001844a9395dc2f948fdad075d5698a
         with:
-          repo_token: "${{ github.token }}"
-          automatic_release_tag: "ci"
+          tag_name: "ci"
+          name: "CI build"
           prerelease: true
-          title: "CI build"
           files: dist/*.zip
