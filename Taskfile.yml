@@ -1,0 +1,41 @@
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task: build
+
+  build:
+    desc: Build all targets
+    cmds:
+      - ./build.sh
+
+  build:verbose:
+    desc: Build with verbose logging
+    cmds:
+      - ./build.sh -with_logging
+
+  build:debug:
+    desc: Build debug binaries
+    cmds:
+      - ./build.sh -with_logging -debug
+
+  build:verbose:debug:
+    desc: Build verbose debug binaries
+    cmds:
+      - ./build.sh -with_logging -debug
+
+  test:
+    desc: Run C tests
+    cmds:
+      - echo "C tests not yet implemented"
+
+  lint:
+    desc: Run lint checks
+    cmds:
+      - echo "lint not yet configured"
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf build artifacts
