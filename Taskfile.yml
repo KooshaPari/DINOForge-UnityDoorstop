@@ -28,7 +28,7 @@ tasks:
   test:
     desc: Run C tests
     cmds:
-      - echo "No C tests configured yet. Add test harness to enable."
+      - gcc -std=c11 -I. -I./src tests/test_config.c src/config/common.c src/nix/config.c src/nix/util.c -o tests/test_config && ./tests/test_config
 
   lint:
     desc: Lint C/C++ code

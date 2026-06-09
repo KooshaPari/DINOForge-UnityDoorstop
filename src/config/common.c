@@ -23,6 +23,7 @@ void cleanup_config() {
     FREE_NON_NULL(config.clr_corlib_dir);
     FREE_NON_NULL(config.clr_runtime_coreclr_path);
     FREE_NON_NULL(config.mono_debug_address);
+    FREE_NON_NULL(config.target_assembly);
 
 #undef FREE_NON_NULL
 }
@@ -41,4 +42,5 @@ void init_config_defaults() {
     config.mono_dll_search_path_override = NULL;
     config.clr_corlib_dir = NULL;
     config.clr_runtime_coreclr_path = NULL;
+    config.target_assembly = NULL;
 }
