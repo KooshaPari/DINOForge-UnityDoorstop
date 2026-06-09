@@ -31,6 +31,11 @@ typedef struct {
     bool_t ignore_disabled_env;
 
     /**
+     * @brief Raw target_assembly string before parsing.
+     */
+    char_t *target_assembly;
+
+    /**
      * @brief Array of paths to managed assemblies to invoke.
      *
      * Populated by parse_target_assembly_string() from a semicolon-delimited

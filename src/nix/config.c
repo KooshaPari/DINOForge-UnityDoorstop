@@ -59,3 +59,33 @@ void load_config() {
     LOG("DOORSTOP_CLR_RUNTIME_CORECLR_PATH: %s", config.clr_runtime_coreclr_path);
     LOG("DOORSTOP_CLR_CORLIB_DIR: %s", config.clr_corlib_dir);
 }
+
+void parse_target_assembly_string(char_t *target_assembly) {
+    config.num_assemblies = 0;
+    config.target_assemblies = (char_t **)malloc(sizeof(char_t *) * 64);
+
+    char_t *current_token = target_assembly;
+    size_t start_index = 0;
+
+    for (size_t src_index = 0;; src_index++) {
+        if (target_assembly[src_index] == ';' ||
+            target_assembly[src_index] == '\0') {
+
+            char_t original_char = target_assembly[src_index];
+            target_assembly[src_index] = '\0';
+
+            if (src_index - start_index > 2) {
+                char_t *entry = strdup(current_token);
+                config.target_assemblies[config.num_assemblies++] = entry;
+            }
+
+            start_index = src_index + 1;
+            current_token = &target_assembly[start_index];
+
+            if (original_char == '\0') {
+                break;
+            }
+            target_assembly[src_index] = ';';
+        }
+    }
+}
