@@ -20,6 +20,8 @@ Doorstop is a tool to execute managed .NET assemblies inside Unity as early as p
 * **Multiplatform**: Supports Windows, Linux, macOS
 * **Debugger support**: Allows to debug managed assemblies in Visual Studio, Rider or dnSpy *without modifications to Mono*
 
+[![AI slop inside](https://sladge.net/badge.svg)](https://sladge.net) [![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/KooshaPari/DINOForge-UnityDoorstop/total)](https://github.com/KooshaPari/DINOForge-UnityDoorstop/releases)
+
 ## Unity runtime support
 
 Doorstop supports executing .NET assemblies in both Unity Mono and Il2Cpp runtimes.
