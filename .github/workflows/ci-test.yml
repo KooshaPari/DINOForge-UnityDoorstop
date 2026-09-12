@@ -1,0 +1,122 @@
+name: CI Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (${{ matrix.cc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - cc: gcc
+            cxx: g++
+          - cc: clang
+            cxx: clang++
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Compile tests
+        run: |
+          ${{ matrix.cc }} -std=c11 -Wall -Wextra -Wpedantic -Werror \
+            -I. -I./src \
+            tests/test_config.c \
+            src/config/common.c \
+            src/nix/config.c \
+            src/nix/util.c \
+            -o tests/test_config
+
+      - name: Run tests
+        run: ./tests/test_config
+
+  test-sanitizers:
+    name: Sanitizers (${{ matrix.sanitizer }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [address, undefined]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Compile with ${{ matrix.sanitizer }} sanitizer
+        run: |
+          clang -std=c11 -Wall -Wextra -fsanitize=${{ matrix.sanitizer }},fuzzer-no-link \
+            -I. -I./src \
+            tests/test_config.c \
+            src/config/common.c \
+            src/nix/config.c \
+            src/nix/util.c \
+            -o tests/test_config_${{ matrix.sanitizer }}
+
+      - name: Run tests with ${{ matrix.sanitizer }} sanitizer
+        env:
+          ASAN_OPTIONS: abort_on_error=1:disable_coredump=0
+          UBSAN_OPTIONS: print_stacktrace=1 halt_on_error=1
+        run: ./tests/test_config_${{ matrix.sanitizer }}
+
+  compile-check:
+    name: Compile check (${{ matrix.cc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - cc: gcc
+          - cc: clang
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Compile all source files
+        run: |
+          ${{ matrix.cc }} -std=c11 -Wall -Wextra -Wpedantic -Werror -fsyntax-only \
+            -I. -I./src \
+            src/bootstrap.c \
+            src/config/common.c \
+            src/nix/config.c \
+            src/nix/entrypoint.c \
+            src/nix/util.c \
+            src/runtimes/globals.c \
+            src/util/paths.c
+
+  fuzz-build:
+    name: Fuzz build (${{ matrix.cc }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - cc: gcc
+          - cc: clang
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Compile fuzz harness
+        run: |
+          ${{ matrix.cc }} -std=c11 -Wall -Wextra -O1 -g \
+            -I. -I./src \
+            tests/fuzz_config.c \
+            src/config/common.c \
+            src/nix/config.c \
+            src/nix/util.c \
+            -o tests/fuzz_config
